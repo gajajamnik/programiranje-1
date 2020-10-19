@@ -64,9 +64,6 @@ def find_suffix(tekst, podniz):
 # >>> double_letters('A volunteer is worth twenty pressed men.')
 # {'volunteer', 'pressed'}
 ###############################################################################
-#def double_letters(tekst):
-#    kljuc = ".*(\w*\w{2}\w*).*"
-
 
 #   (.)\1   to pomeni kakrkoli in to ponovi se enkrat
 #match od 0 je vedno vse!!!

@@ -21,7 +21,7 @@
  Namig: Najlažje je, da igralca poimenujete kar glede na simbol.
 [*----------------------------------------------------------------------------*)
 
-type player = unit  (* DOPOLNI ME *)
+type player = X | O
 
 (*----------------------------------------------------------------------------*]
  Igralno mrežo predstavimo s trojico vrstic, kjer je vsaka vrstica trojica polj.
@@ -33,13 +33,17 @@ type player = unit  (* DOPOLNI ME *)
  Namig: Vaša koda bo lepša, če definirate še dodatne tipe.
 [*----------------------------------------------------------------------------*)
 
-type grid = unit  (* DOPOLNI ME *)
+type field = player option
+type row = field * field * field
+type grid = row * row * row
 
 (*----------------------------------------------------------------------------*]
  Definirajte vrednost, ki predstavlja prazno mrežo.  
 [*----------------------------------------------------------------------------*)
 
-let empty_grid : grid = () (* DOPOLNI ME *)
+let empty_grid : grid =
+   let empty_row : row = (None, None, None) in
+   (empty_row, empty_row, empty_row)
 
 (*----------------------------------------------------------------------------*]
  Ker je mreža fiksne velikosti 3x3 lahko definiramo poseben tip za številčenje.
@@ -57,9 +61,15 @@ type index = Zero | One | Two
  trojico, ki ima primerno polje posodobljeno na podano vrednost.
 [*----------------------------------------------------------------------------*)
 
-let get_index index (x0, x1, x2) = failwith "DOPOLNI ME"
+let get_index index (x0, x1, x2) = match index with
+  | Zero -> x0
+  | One -> x1
+  | Two -> x2
 
-let set_index index x (x0, x1, x2) = failwith "DOPOLNI ME"
+let set_index index x (x0, x1, x2) = match index with
+  | Zero -> (x, x1, x2)
+  | One -> (x0, x, x2)
+  | Two -> (x0, x1, x)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [get_field] vrne vrednost polja v mreži, ki ga določata podana
@@ -85,11 +95,13 @@ let set_field (row_i : index) (col_i : index) x grid =
  funkcija [is_full_grid] pa preveri zapolnjenost mreže.
 [*----------------------------------------------------------------------------*)
 
-let is_full_row row = failwith "DOPOLNI ME"
+let is_full_row = function
+  | Some _, Some _, Some _ -> true
+  | _ -> false
 
 let is_full_grid grid =
     let (r1, r2, r3) = grid in
-    (* Preklopimo na seznam, da lahko uporabimo knjižnico *)
+    (* Preklopimo na seznam, da lahko uporabimo knjižnico - funcija preveri za vse vrstice ce so polne *)
     List.for_all is_full_row [r1; r2; r3]
 
 (*----------------------------------------------------------------------------*]
@@ -104,9 +116,17 @@ let is_full_grid grid =
  seznam vseh možnosti in preveri seznam.
 [*----------------------------------------------------------------------------*)
 
-let winner_of_triple triple : player option = failwith "DOPOLNI ME"
+let winner_of_triple triple : player option = match triple with
+  | Some X, Some X, Some X -> Some X
+  | Some O, Some O, Some O -> Some O
+  | _ -> None
 
-let winner_of_list triples : player option = failwith "DOPOLNI ME"
+let rec winner_of_list = function
+  | [] -> None
+  | triple :: triples ->
+      match winner_of_triple triple with
+        | Some p -> Some p
+        | None -> winner_of_list triples
 
 let winner_of_grid grid =
   (* Pripravimo si vse trojice, kjer bi lahko dosegli tri v vrsto. *)
@@ -127,7 +147,7 @@ let winner_of_grid grid =
  konča bodisi z zmago nekega igralca bodisi z remijem.  
 [*----------------------------------------------------------------------------*)
 
-type result = unit  (* DOPOLNI ME *)
+type result = Winner of player | Tie
 
 (*----------------------------------------------------------------------------*]
  Stanje igre predstavimo z vsotnim tipom [state]. Ali je na potezi eden od
@@ -140,10 +160,11 @@ type result = unit  (* DOPOLNI ME *)
 [*----------------------------------------------------------------------------*)
 
 type state = 
+(* lahko bi dali  Onturn of player * grid ampak je boljse uporabljat recorde *)
   | OnTurn of {player : player; grid : grid} 
   | GameOver of {result : result; final_grid : grid}
 
-let initial_state = "DOPOLNI ME"  (* in dodaj anotacijo [: state] *) 
+let initial_state : state = OnTurn {player = X; grid = empty_grid}
 
 (*----------------------------------------------------------------------------*]
  Funkcija [other_player] sprejme igralca in vrne njegovega nasprotnika.
@@ -154,26 +175,32 @@ let initial_state = "DOPOLNI ME"  (* in dodaj anotacijo [: state] *)
  in vrne posodobljeno stanje. 
 [*----------------------------------------------------------------------------*)
 
-let other_player player = failwith "DOPOLNI ME"
+let other_player = function
+  | X -> O 
+  | O -> X
 
-let place_token player grid (row_i, col_i) : state =
+let place_token (player : player) (grid : grid) (row_i, col_i) : state =
   (* [updated_grid] je mreža, kjer je na mestu določenim z [row_i] in [col_i]
      igralec [player] odigral potezo. Uporabite funkcijo [set_field]. *)
-  let updated_grid = failwith "DOPOLNI ME" in
+  
+  let updated_grid = set_field row_i col_i (Some player) grid in
+  
   (* Preverimo, ali smo dobili zmagovalca. *)
   match winner_of_grid updated_grid with
   | None when not (is_full_grid updated_grid) ->
       (* V tej potezi nismo dobili zmagovalca ampak igra se lahko nadaljuje.
       Vrnemo [OnTurn] s posodobljeno mrežo in nasprotnikom, ki je na potezi. *)
-      failwith "DOPOLNI ME"
+      OnTurn {player = other_player player; grid = updated_grid}
+  
   | None (* grid is full *) ->
       (* Ni bilo zmagovalca, vendar so vsa polja polna. Vrnemo [GameOver] z
       novo mrežo in oznako za neodločen izid. *)
-      failwith "DOPOLNI ME"
+      GameOver {result = Tie; final_grid = updated_grid}
+  
   | Some player ->
       (* Dobili smo zmagovalca, torej vrnemo [GameOver] z novo mrežo in
       zmagovalcem *)
-      failwith "DOPOLNI ME"
+      GameOver {result = Winner player; final_grid = updated_grid}
 
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
@@ -201,7 +228,7 @@ let place_token player grid (row_i, col_i) : state =
  mrežo ter trenutno situacijo (kdo je na potezi, kdo je zmagal).
 [*----------------------------------------------------------------------------*)
 
-let show_player player = failwith "DOPOLNI ME"
+let show_player = function X -> "X" | O -> "O"
 
 let show_field = function
   | None -> " "
@@ -211,6 +238,7 @@ let show_row (a0, a1, a2) =
     "| "
   ^ String.concat " | " (List.map show_field [ a0; a1; a2 ])
   ^ " |\n"
+(* String.concat je enako kot string.join v pythonu *)
 
 let show_grid (row1, row2, row3) =
   let line = "+---+---+---+\n" in
@@ -222,7 +250,11 @@ let show_state = function
   | OnTurn {player; grid} ->
       "Na potezi je: " ^ show_player player ^ "\n" ^ show_grid grid ^ "\n"
   | GameOver {result; final_grid} ->
-      let winner_message = "DOPOLNI ME" in
+      let winner_message = 
+        match result with
+        | Tie -> "Nihce ni zmagal"
+        | Winner p -> "Zmagal je igralec" ^ show_player p ^ "!"
+      in
       winner_message ^ "\n" ^ show_grid final_grid ^ "\n"
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
@@ -236,8 +268,14 @@ let show_state = function
  Funkcija [choose] sprejme niz, ki igralcu pove katerega od indeksov izbira
  (stolpec ali vrstico). Nato prebere izbiro, in jo poskusi pretvoriti v indeks.
  Če vnos ni primeren, proces ponovi.
+
+ read_line je kot input v pythonu
 [*----------------------------------------------------------------------------*)
-let string_to_index = failwith "DOPOLNI ME"
+let string_to_index = function
+  | "0" -> Some Zero
+  | "1" -> Some One 
+  | "2" -> Some Two
+  | _ -> None
 
 let rec choose kind =
   (* Sporočilo kaj želimo. *)
@@ -246,7 +284,9 @@ let rec choose kind =
   let choice = read_line () in
   match string_to_index choice with
   | Some result -> result (* Vrnemo veljaven rezultat. *)
-  | None -> choose kind   (* Izbrana vrednost ni veljavna. *)
+  | None -> 
+      print_string ("Neveljavna izbira!\n");
+      choose kind   (* Izbrana vrednost ni veljavna. *)
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
                                 POTEK IGRE
@@ -266,9 +306,25 @@ let rec choose kind =
      nespremenjeno. V obeh primerih ponovno požene zanko, da se igra nadaljuje.
 [*----------------------------------------------------------------------------*)
 
-let rec loop state = failwith "DOPOLNI ME"
+let rec loop (state : state) : unit =
+  (*Izpis stanja*)
+  print_string (show_state state);
+  match state with
+  | GameOver _ -> ()
+  | OnTurn {player; grid} ->
+    let row_i = choose "Izberite vrstico" in
+    let col_i = choose "Izberite stolpec" in
+    (*preveri veljavnost poteze*)
+    match get_field row_i col_i grid with 
+    | Some _ -> 
+      print_string "Polje je ze zasedeno\n";
+      loop state
+    | None ->
+      let updated_state = place_token player grid (row_i, col_i) in 
+      loop updated_state
+  
 
 (*----------------------------------------------------------------------------*]
  Funkcija [play_game] požene svežo igro.
 [*----------------------------------------------------------------------------*)
-let rec play_game () = failwith "DOPOLNI ME"
+let rec play_game () = loop initial_state

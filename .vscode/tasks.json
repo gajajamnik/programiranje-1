@@ -25,15 +25,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "windows": {
-                "command": "ocaml -init \\\"${file}\\\""
-                },
-            "linux": {
-                "command": "ocaml -init \"${file}\""
-            },
-            "osx": {
-                "command": "ocaml -init \"${file}\""
-            }
-        }
+            "command": "C:\\OCaml32\\usr\\local\\bin\\ocaml-env.exe exec -- C:\\OCaml32\\home\\gajaj\\.opam\\4.11.1+mingw32c\\bin\\ocaml.exe -init \"${file}\""
+        }    
     ]
 }

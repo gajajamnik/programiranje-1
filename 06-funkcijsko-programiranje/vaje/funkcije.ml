@@ -4,7 +4,18 @@
 Namig: Definirajte pomožno funkcijo za obračanje seznamov.
 [*----------------------------------------------------------------------------*)
 
-let rec reverse = ()
+let rec bad_reverse = function
+  | [] -> []
+  | x :: xs -> bad_reverse xs @ [x]
+
+(** primer z repno rekurzijo *)
+let reverse list =
+  let rec reverse_aux acc list =
+    match list with
+      | [] -> acc
+      | x :: xs -> reverse_aux (x :: acc) xs
+  in
+  reverse_aux [] list
 
 (*----------------------------------------------------------------------------*]
  Funkcija [repeat x n] vrne seznam [n] ponovitev vrednosti [x]. Za neprimerne
@@ -16,7 +27,20 @@ let rec reverse = ()
  - : string list = []
 [*----------------------------------------------------------------------------*)
 
-let rec repeat = ()
+let rec repeat x n = 
+  if n <= 0 then
+    []
+  else
+    x :: repeat x (n - 1)
+
+let rec repeat_rep x n =
+  let rec aux n acc =
+    if n <= 0 then
+      acc
+    else
+      aux (n - 1) (x :: acc)
+  in
+  aux n []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [range] sprejme število in vrne seznam vseh celih števil od 0 do
@@ -27,7 +51,14 @@ let rec repeat = ()
  - : int list = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10]
 [*----------------------------------------------------------------------------*)
 
-let rec range = ()
+let rec range n =
+  let rec aux n acc =
+    if n < 0 then
+      acc
+    else
+      aux (n - 1) (n :: acc)
+  in
+  aux n []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map f list] sprejme seznam [list] oblike [x0; x1; x2; ...] in
@@ -39,7 +70,10 @@ let rec range = ()
  - : int list = [2; 3; 4; 5; 6]
 [*----------------------------------------------------------------------------*)
 
-let rec map = ()
+let rec map f = function
+  | [] -> []
+  | x :: xs -> f x :: map f xs
+
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map_tlrec] je repno rekurzivna različica funkcije [map].
@@ -49,7 +83,12 @@ let rec map = ()
  - : int list = [2; 3; 4; 5; 6]
 [*----------------------------------------------------------------------------*)
 
-let rec map_tlrec = ()
+let rec map_tlrec f list = 
+  let rec map_aux acc = function
+    | [] -> reverse acc
+    | x :: xs -> map_aux (f x :: acc) xs
+  in
+  map_aux [] list
 
 (*----------------------------------------------------------------------------*]
  Funkcija [mapi] je ekvivalentna python kodi:
@@ -67,7 +106,13 @@ let rec map_tlrec = ()
  - : int list = [0; 1; 2; 5; 6; 7]
 [*----------------------------------------------------------------------------*)
 
-let rec mapi = ()
+let rec mapi f list =
+(* f je funkcija dveh argumentov*)
+  let rec mapi_aux i acc = function
+    | [] -> reverse acc
+    | x :: xs -> mapi_aux (i + 1) ((f x i) :: acc) xs  (* obvezno uporabis na seznamu xs *)
+  in
+  mapi_aux 0 [] list
 
 (*----------------------------------------------------------------------------*]
  Funkcija [zip] sprejme dva seznama in vrne seznam parov istoležnih
@@ -79,7 +124,35 @@ let rec mapi = ()
  Exception: Failure "Different lengths of input lists.".
 [*----------------------------------------------------------------------------*)
 
-let rec zip = ()
+let rec zip list1 list2 =
+  match list1 with
+  | x :: xs -> (
+    match list2 with
+      | y :: ys -> (x, y) :: zip xs ys
+      | [] -> failwith "Different lenght of input lists")
+  | [] -> (
+    match list2 with
+      | y :: ys -> failwith "Different lenght of input lists"
+      | [] -> []
+  )
+
+let rec zip' list1 list2 =
+  match list1, list2 with
+  | x :: xs, y :: ys -> (x, y) :: zip xs ys
+  | x :: xs, [] -> failwith "Different lenght of input lists"
+  | [], y :: ys -> failwith"Different lenght of input lists"
+  | [], [] -> []
+
+(*
+let rec zip_repna list1 list2 =
+  let rec zip_tlrec acc list1 list2 = function
+    match list1, list2 with
+    | x :: xs, y :: ys -> zip_tlrec ((x, y) :: acc) xs ys
+    | [], [] -> reverse acc
+    | _, [] -> filwith "Different lenght of input lists"
+*) 
+
+
 
 (*----------------------------------------------------------------------------*]
  Funkcija [unzip] je inverz funkcije [zip], torej sprejme seznam parov
@@ -89,7 +162,12 @@ let rec zip = ()
  - : int list * string list = ([0; 1; 2], ["a"; "b"; "c"])
 [*----------------------------------------------------------------------------*)
 
-let rec unzip = ()
+let rec unzip = function
+  | [] -> ([], [])
+  | xy :: xys ->
+     let (x, y) = xy in
+     let (xs, ys) = unzip xys in
+     (x :: xs, y :: ys)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [unzip_tlrec] je repno rekurzivna različica funkcije [unzip].
@@ -98,7 +176,13 @@ let rec unzip = ()
  - : int list * string list = ([0; 1; 2], ["a"; "b"; "c"])
 [*----------------------------------------------------------------------------*)
 
-let rec unzip_tlrec = ()
+let rec unzip_tlrec list = 
+  let rec aux acc1 acc2 = function  (* akumulatorja sta lahko dva *)
+    | [] -> (reverse acc1, reverse acc2)
+    | (x, y) :: xys -> aux (x :: acc1)(y :: acc2) xys
+  in
+  aux [] [] list
+
 
 (*----------------------------------------------------------------------------*]
  Funkcija [loop condition f x] naj se izvede kot python koda:
@@ -113,7 +197,12 @@ let rec unzip_tlrec = ()
  - : int = 12
 [*----------------------------------------------------------------------------*)
 
-let rec loop = ()
+let rec loop condition f x =
+  if condition x then
+    let x' = f x in
+    loop condition f x'
+  else
+    x
 
 (*----------------------------------------------------------------------------*]
  Funkcija [fold_left_no_acc f list] sprejme seznam [x0; x1; ...; xn] in

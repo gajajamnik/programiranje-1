@@ -94,9 +94,11 @@ let rec sum_int_pairs sez =
  - : int = 1
 [*----------------------------------------------------------------------------*)
 
-let rec get k list = match list with
+let rec get k list= match list with
   | [] -> failwith "Prekratek seznam"
-  | a:: rest -> (if k <= 0 then a else get (k-1) rest)
+  | a:: rest -> (
+    if k <= 0 then a 
+    else get (k-1) rest)
   
 
 (*----------------------------------------------------------------------------*]
@@ -122,9 +124,9 @@ let rec double = function
 
 let rec insert x k seznam = match seznam with
   | [] ->  [] (* k je nepomemben, ker je zmanjaklo seznama *)
-  | e::rest -> (
-    if k <= 0 then x::e::rest
-    else e:: (insert x (k-1) rest)
+  | glava::rep -> (
+    if k <= 0 then x::glava::rep      
+    else glava:: (insert x (k-1) rep)
   )
 
 (*----------------------------------------------------------------------------*]
@@ -138,10 +140,14 @@ let rec insert x k seznam = match seznam with
  - : int list * int list = ([1; 2; 3; 4; 5], [])
 [*----------------------------------------------------------------------------*)
 
+(* 
+[x:xs];  xs = [x', ..., x'',x''',...]; prvi = [x'...,x''] drugi = [x'''...] -> razdelitev je [x, x',...x''] in [x''',...]
+*)
+
 let rec divide k list = match (k, list) with
   | (0, d) -> ([], d)
   | (k', x::xs) -> (
-    let (prvi, drugi) = divide (k' - 1) xs in
+    let (prvi, drugi) = divide (k' - 1) xs in      
     (x::prvi, drugi)
   )
   | (_, []) -> ([], [])
@@ -195,7 +201,8 @@ let rec is_palindrome list =
  - : int list = [5; 4; 3; 3; 4]
 [*----------------------------------------------------------------------------*)
 
-let rec max_on_components l1 l2 = match l1, l2 with
+let rec max_on_components l1 l2 =
+  match l1, l2 with
   | ([], _) -> []
   | (_, []) -> []
   | (x::xs, y::ys) -> (if x > y then x else y) :: max_on_components xs ys
@@ -210,6 +217,11 @@ let rec max_on_components l1 l2 = match l1, l2 with
  - : int = 10
 [*----------------------------------------------------------------------------*)
 
+let second_largest sez = 
+  let rec najvecja_vrednost s = match s with
+  | [] -> 0
+  | x:: xs -> (if x > najvecja_vrednost xs then x else najvecja_vrednost xs)
+  in najvecja_vrednost (remove (najvecja_vrednost sez) sez)
 
 
 

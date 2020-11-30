@@ -33,7 +33,7 @@ let middle_of_triple_let triple =
  - : int = 1
 [*----------------------------------------------------------------------------*)
 
-let rec starting_element list =
+let starting_element list =
   match list with
   | [] -> assert false
   | glava :: rep -> glava
@@ -53,7 +53,7 @@ let rec multiply sez =
   | [] -> 1
   | glava :: rep -> glava * multiply rep
 
-let rec multiply_fun sez = function
+let rec multiply_fun = function
   | [] -> 1
   | glava :: rep -> glava * multiply rep
 
@@ -79,11 +79,11 @@ let multiply_tailrec sez =
  - : int list = [-1; 7; 0]
 [*----------------------------------------------------------------------------*)
 
-(*
-let rec sum_int_pairs_krajse pair_list = function
+let rec sum_int_pairs sez =
+  match sez with
   | [] -> []
-  | (prvi, drugi) :: rep -> (prvi + drugi) :: (sum_int_pairs_krajse rep)
-*)
+  | (prvi, drugi) :: rep -> (prvi + drugi) :: (sum_int_pairs rep)
+
 
 (*----------------------------------------------------------------------------*]
  Funkcija [get k list] poišče [k]-ti element v seznamu [list]. Številčenje

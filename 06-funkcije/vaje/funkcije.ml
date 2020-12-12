@@ -4,7 +4,7 @@
 Namig: Definirajte pomožno funkcijo za obračanje seznamov.
 [*----------------------------------------------------------------------------*)
 
-let rec bad_reverse = function
+let rec bad_reverse sez = match sez with
   | [] -> []
   | x :: xs -> bad_reverse xs @ [x]
 

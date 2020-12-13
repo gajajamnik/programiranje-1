@@ -33,14 +33,14 @@ let rec repeat x n =
   else
     x :: repeat x (n - 1)
 
-let rec repeat_rep x n =
-  let rec aux n acc =
+let repeat_rep x n =
+  let rec aux acc n =
     if n <= 0 then
       acc
     else
-      aux (n - 1) (x :: acc)
+      aux (x :: acc) (n - 1)
   in
-  aux n []
+  aux [] n
 
 (*----------------------------------------------------------------------------*]
  Funkcija [range] sprejme število in vrne seznam vseh celih števil od 0 do
@@ -51,7 +51,7 @@ let rec repeat_rep x n =
  - : int list = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10]
 [*----------------------------------------------------------------------------*)
 
-let rec range n =
+let range n =
   let rec aux n acc =
     if n < 0 then
       acc
@@ -70,7 +70,7 @@ let rec range n =
  - : int list = [2; 3; 4; 5; 6]
 [*----------------------------------------------------------------------------*)
 
-let rec map f = function
+let rec map f list = match list with
   | [] -> []
   | x :: xs -> f x :: map f xs
 
@@ -83,9 +83,10 @@ let rec map f = function
  - : int list = [2; 3; 4; 5; 6]
 [*----------------------------------------------------------------------------*)
 
-let rec map_tlrec f list = 
-  let rec map_aux acc = function
-    | [] -> reverse acc
+
+let map_tlrec f list = 
+  let rec map_aux acc list = match list with
+    | [] -> reverse acc                       (* tu je nujno potreben REVERSE ker nalagamo iz leve strani *)
     | x :: xs -> map_aux (f x :: acc) xs
   in
   map_aux [] list
@@ -108,7 +109,7 @@ let rec map_tlrec f list =
 
 let rec mapi f list =
 (* f je funkcija dveh argumentov*)
-  let rec mapi_aux i acc = function
+  let rec mapi_aux i acc list = match list with
     | [] -> reverse acc
     | x :: xs -> mapi_aux (i + 1) ((f x i) :: acc) xs  (* obvezno uporabis na seznamu xs *)
   in

@@ -60,9 +60,8 @@ let rec follow directions tree = match tree with
     | Vozlisce(l, y, r) ->
         match directions with
         | [] -> Some y
-        | x :: xs ->
-            if x = Right then follow xs r
-            else follow xs l
+        | Right :: xs -> follow xs r
+        | Left :: xs -> follow xs l
 
 (*----------------------------------------------------------------------------*]
  Funkcija [prune directions tree] poišče vozlišče v drevesu glede na navodila,

@@ -75,6 +75,13 @@ let rec follow directions tree = match tree with
  Some (Node (Node (Node (Empty, 0, Empty), 2, Empty), 5, Empty))
 [*----------------------------------------------------------------------------*)
 
+let rec prune directions tree = match tree with
+    | Prazno -> Prazno
+    | Vozlisce(l, y, r) ->
+        match directions with
+        | [] -> Prazno
+        | Right :: xs -> Vozlisce(l, y, prune xs r)
+        | Left :: xs -> Vozlisce(prune xs l, y, r)
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  PHANTOM TREES
@@ -86,7 +93,13 @@ let rec follow directions tree = match tree with
  drevesu izbrisano in ga upoštevamo le še kot delitveno vozlišče. Še vedno
  predpostavljamo, da imajo drevesa obliko BST.
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
+type state =
+    | Exists
+    | Ghost
 
+type 'a phantom_tree =
+    | Empty
+    | Node of 'a phantom_tree * 'a * 'a phantom_tree * state
 
 (*----------------------------------------------------------------------------*]
  Funkcija [phantomize] tipa ['a tree -> 'a phantom_tree] navadnemu drevesu
@@ -108,6 +121,15 @@ let rec follow directions tree = match tree with
  P_Node (P_Node (P_Empty, 3, P_Empty, Ghost), 4, P_Empty, Exists), Exists)
 [*----------------------------------------------------------------------------*)
 
+let rec phantomize tree = match tree with 
+    | Prazno -> Empty
+    | Vozlisce(l, y, r) -> Node(phantomize l, y, phantomize r, Exists)
+
+let rec kill x p_tree = match p_tree with
+    | Empty -> Empty
+    | Node(l, y, r, s) -> 
+        if y = x then Node(l, y, r, Ghost)
+        else Node(kill x l, y, kill x r, s)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [unphantomize] tipa ['a phantom_tree -> 'a tree] fantomskemu drevesu 
@@ -119,3 +141,12 @@ let rec follow directions tree = match tree with
  # test_tree |> phantomize |> kill 7 |> kill 0 |> kill 5 |> unphantomize;;
  - : int tree = Node (Node (Node (Empty, 2, Empty), 6, Empty), 11, Empty)
 [*----------------------------------------------------------------------------*)
+
+let unphantomize p_tree = 
+    let rec list_of_p_tree p_tree = match p_tree with
+     | Empty -> []
+     | Node(l, x, r, s) -> 
+        if s = Exists then (list_of_p_tree l) @ [x] @ (list_of_p_tree r)
+        else (list_of_p_tree l) @ (list_of_p_tree r)
+    in 
+    p_tree |> list_of_p_tree |> bst_of_list

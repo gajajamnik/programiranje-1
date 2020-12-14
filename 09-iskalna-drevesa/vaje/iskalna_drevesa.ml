@@ -5,7 +5,9 @@
  bodisi prazna, bodisi pa vsebujejo podatek in imajo dve (morda prazni)
  poddrevesi. Na tej točki ne predpostavljamo ničesar drugega o obliki dreves.
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
-type 'a tree = Prazno | Vozlisce of 'a tree * 'a * 'a tree
+type 'a tree = 
+     |Prazno 
+     | Vozlisce of 'a tree * 'a * 'a tree
 
 (*----------------------------------------------------------------------------*]
  Definirajmo si testni primer za preizkušanje funkcij v nadaljevanju. Testni
@@ -149,7 +151,7 @@ let rec member x drevo = match drevo with
 
 let rec member2 x drevo = match drevo with
      | Prazno -> false
-     | Vozlisce (l, y, r) -> member2 x l || member2 x r || (x = y)
+     | Vozlisce (l, y, r) -> member2 x l || member2 x r || (x = y)      (*  || pomeni ali  *)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [succ] vrne naslednjika korena danega drevesa, če obstaja. Za drevo
@@ -165,7 +167,7 @@ let rec member2 x drevo = match drevo with
 [*----------------------------------------------------------------------------*)
 let rec minimal drevo = match drevo with
      | Prazno -> None
-     | Vozlisce(Prazno, x, _) -> Some x
+     | Vozlisce(Prazno, x, _) -> Some x        (* OPTION TYPE *)
      | Vozlisce(l, _, _) -> minimal l
 
 let rec maximal drevo = match drevo with
@@ -203,10 +205,11 @@ let rec delete x drevo = match drevo with
           else if x > y then
                Vozlisce(l, y, delete x d)
           else 
-               let nas = succ Vozlisce(l, y, d) in 
+               let nas = succ (Vozlisce (l, y, d)) in 
                match nas with 
                     | None -> l
                     | Some nas -> Vozlisce(l, nas, delete nas d)
+          
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  SLOVARJI
@@ -241,7 +244,7 @@ let test_dict =
  # dict_get "c" test_dict;;
  - : int option = Some (-2)
 [*----------------------------------------------------------------------------*)
-let rec dict_get drevo = match drevo with
+let rec dict_get k drevo = match drevo with
      | Prazno -> None
      | Vozlisce (l, (k', v'), r) ->
           if k < k' then
@@ -267,10 +270,10 @@ let rec dict_get drevo = match drevo with
  - : unit = ()
 [*----------------------------------------------------------------------------*)
 let rec print_string_int_dict = function
-     | Prazno -> ()
+     | Prazno -> ()                                                   (* <-- ker vemo da print vraca unit moramo tudi pri tej moznosti vrnit unit *)
      | Vozlisce (l, (k, v), r) -> 
            let () = print_endline (k ^ " : " ^(string_of_int v)) in
-           print_string_int_dict l;
+           print_string_int_dict l;                                   (* ko imas vec zaporednih funkcij ki vracaji unit obvezno PODPICJE ;  *)
            print_string_int_dict r
 
 (*----------------------------------------------------------------------------*]
@@ -292,11 +295,11 @@ let rec print_string_int_dict = function
  - : unit = ()
 [*----------------------------------------------------------------------------*)
 let rec dict_insert k v = function
-     | Prazen -> leaf (k, v)
+     | Prazno -> leaf (k, v)            (* ce je prazno drevo ustvari nov list *)
      | Vozlisce (l, (k', v'), r) ->
           if k < k' then
                Vozlisce(dict_insert k v l, (k', v'), r)
           else if k' < k then 
                Vozlisce(l, (k', v'), dict_insert k v r)
           else
-               Vozlisce(l, (k', v'), r)
+               Vozlisce(l, (k, v), r)

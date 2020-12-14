@@ -1,7 +1,24 @@
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  DODATNE VAJE 
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
+type 'a tree = 
+     |Prazno 
+     | Vozlisce of 'a tree * 'a * 'a tree
 
+let leaf x = Vozlisce (Prazno, x, Prazno)
+
+let testno_drevo = Vozlisce (Vozlisce(leaf 0, 2, Prazno), 5, Vozlisce(leaf 6, 7, leaf 11))
+
+let rec insert x drevo = match drevo with
+     | Prazno -> leaf x
+     | Vozlisce(l, y, r) -> 
+          if (x < y) then Vozlisce(insert x l, y, r)
+          else if (x > y) then Vozlisce(l, y, insert x r)
+          else Vozlisce(l, y, r)
+
+let rec list_of_tree drevo = match drevo with
+     | Prazno -> []
+     | Vozlisce(levi, x, desni) -> (list_of_tree levi) @ [x] @ (list_of_tree desni)
 (*----------------------------------------------------------------------------*]
  Funkcija [bst_of_list] iz seznama naredi dvojiško iskalno drevo.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -9,6 +26,7 @@
  - : bool = true
 [*----------------------------------------------------------------------------*)
 
+let bst_of_list list = List.fold_right insert list Prazno
 
 (*----------------------------------------------------------------------------*]
  Funkcija [tree_sort] uredi seznam s pomočjo pretvorbe v bst in nato nazaj
@@ -20,6 +38,7 @@
  - : string list = ["a"; "b"; "c"; "d"; "e"; "f"]
 [*----------------------------------------------------------------------------*)
 
+let tree_sort list = list |> bst_of_list |> list_of_tree
 
 (*----------------------------------------------------------------------------*]
  Funkcija [follow directions tree] tipa [direction list -> 'a tree -> 'a option]
@@ -32,7 +51,18 @@
  # follow [Right; Left; Right; Right] test_tree;;
  - : int option = None
 [*----------------------------------------------------------------------------*)
+type directions =
+    | Right
+    | Left
 
+let rec follow directions tree = match tree with
+    | Prazno -> None
+    | Vozlisce(l, y, r) ->
+        match directions with
+        | [] -> Some y
+        | x :: xs ->
+            if x = Right then follow xs r
+            else follow xs l
 
 (*----------------------------------------------------------------------------*]
  Funkcija [prune directions tree] poišče vozlišče v drevesu glede na navodila,

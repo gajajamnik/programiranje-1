@@ -58,7 +58,7 @@ let rec insert_sort list = match list with
     | [] -> []
     | x :: xs -> insert x (insert_sort xs)
 
-let insert_sort_pro = List.fold_left (fun list x -> insert x list) []
+let insert_sort_pro sez = List.fold_left (fun list x -> insert x list) [] sez
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*]
  Urejanje z Izbiranjem

@@ -109,12 +109,9 @@ def quicksort_part(a, start, stop):
         quicksort_part(a, start, pivot_i - 1)
         quicksort_part(a, pivot_i + 1, stop)
 
-<<<<<<< HEAD
 def quicksort(a):
     return quicksort_part(a, 0, len(a))
 
-=======
->>>>>>> 543840f8d14842578032926eca62a7998f900bd5
 ###############################################################################
 # Če imamo dve urejeni tabeli, potem urejeno združeno tabelo dobimo tako, da
 # urejeni tabeli zlijemo. Pri zlivanju vsakič vzamemo manjšega od začetnih

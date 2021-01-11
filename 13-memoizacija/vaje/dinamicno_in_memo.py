@@ -11,6 +11,39 @@ from functools import lru_cache
 # podzaporedje `[2, 3, 4, 4, 6, 7, 8, 9]`.
 # -----------------------------------------------------------------------------
 
+def najdaljse_narascajoce_podazporedje(seznam):
+    
+    l = len(seznam)
+    for i in range(0, l - 2):
+        x = seznam[i]
+        naslednji = seznam[i + 1]
+        if naslednji < x:
+            seznam.remove(naslednji)
+            l = len(seznam)
+    return seznam
+
+#najdaljse_narascajoce_podazporedje([2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9])
+
+def najdaljse_narascajoce_podazporedje_2(seznam):
+    #Rabimo dve stvari
+    #Memoiziramo to funkcijo
+    @lru_cache(maxsize=None)
+    def podzaporedje(i, zadnji): #i je clen na katerem smo
+        if i >= len(seznam):
+            return []
+        if seznam[i] >= zadnji:
+            #ce ga vzamemo
+            vzamemo = [seznam[i]] + podzaporedje(i+1, l[i])
+            #ce ga ne vzamemo
+            ne_vzamemo = podzaporedje(i+1, zadnji)
+            if len(vzamemo) >= len(ne_vzamemo):
+                return vzamemo
+            return ne_vzamemo
+        else: #seznam[i] < zadnji
+            #Gremo naprej
+            return ne_vzamemo
+    return podzaporedje(0, float("-inf"))
+            # tu das minus neskoncno da bo prvi element seznama vedno vecji
 # -----------------------------------------------------------------------------
 # Rešitev sedaj popravite tako, da funkcija `vsa_najdaljsa` vrne seznam vseh
 # najdaljših naraščajočih podzaporedij.
@@ -43,7 +76,26 @@ from functools import lru_cache
 # dva.
 # =============================================================================
 
+def zabica(mocvara):
+    #vedeti moramo dve stvari:
+    #   - kje smo
+    #   - koliko energije ima zabica, torej na katere lokvanje lahko dejansko skoci
+    
+    # stevilo moznosti ki jih moramo sprobat je odvisno oda stanja zabice
+    def zabica_notranja(i, e_ostanek):
+        #kdaj nehamo
+        if i >= len(mocvara):
+            return 0
+        # koliko energije imamo na prvem lokvanju
+        energija = e_ostanek + mocvara[i]
+        #skoci navzgor
+        #kam lahko skocimo navzdol (na keri lokvanj)
+        navzdol = [zabica_notranja(i + dolzina_skoka, energija -dolzina_skoka)
+                    for dolzina_skoka in range(1, energija + 1)]
+        #najbolja bo moznost, ki nam vzame najmanj energije
+        return 1 + min(navzdol)
 
+    return zabica_notranja(0, 0)
 
 # =============================================================================
 # Nageljni

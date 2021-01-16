@@ -11,18 +11,18 @@ from functools import lru_cache
 # podzaporedje `[2, 3, 4, 4, 6, 7, 8, 9]`.
 # -----------------------------------------------------------------------------
 
-def najdaljse_narascajoce_podazporedje(seznam):
-    
-    l = len(seznam)
-    for i in range(0, l - 2):
-        x = seznam[i]
-        naslednji = seznam[i + 1]
-        if naslednji < x:
-            seznam.remove(naslednji)
-            l = len(seznam)
-    return seznam
-
-#najdaljse_narascajoce_podazporedje([2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9])
+#def najdaljse_narascajoce_podazporedje(seznam):
+#    
+#    l = len(seznam)
+#    for i in range(0, l - 2):
+#        x = seznam[i]
+#        naslednji = seznam[i + 1]
+#        if naslednji < x:
+#            seznam.remove(naslednji)
+#            l = len(seznam)
+#    return seznam
+#
+#
 
 def najdaljse_narascajoce_podazporedje_2(seznam):
     #Rabimo dve stvari
@@ -33,17 +33,21 @@ def najdaljse_narascajoce_podazporedje_2(seznam):
             return []
         if seznam[i] >= zadnji:
             #ce ga vzamemo
-            vzamemo = [seznam[i]] + podzaporedje(i+1, l[i])
+            vzamemo = [seznam[i]] + podzaporedje(i+1, seznam[i])
             #ce ga ne vzamemo
             ne_vzamemo = podzaporedje(i+1, zadnji)
             if len(vzamemo) >= len(ne_vzamemo):
                 return vzamemo
-            return ne_vzamemo
+            else:
+                return ne_vzamemo
         else: #seznam[i] < zadnji
             #Gremo naprej
-            return ne_vzamemo
+            return podzaporedje(i + 1, zadnji)
     return podzaporedje(0, float("-inf"))
             # tu das minus neskoncno da bo prvi element seznama vedno vecji
+
+najdaljse_narascajoce_podazporedje_2([2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9])
+
 # -----------------------------------------------------------------------------
 # Rešitev sedaj popravite tako, da funkcija `vsa_najdaljsa` vrne seznam vseh
 # najdaljših naraščajočih podzaporedij.

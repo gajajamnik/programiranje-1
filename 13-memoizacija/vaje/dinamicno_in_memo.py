@@ -85,7 +85,8 @@ def zabica(mocvara):
     #   - kje smo
     #   - koliko energije ima zabica, torej na katere lokvanje lahko dejansko skoci
     
-    # stevilo moznosti ki jih moramo sprobat je odvisno oda stanja zabice
+    # stevilo moznosti ki jih moramo sprobat je odvisno od stanja zabice
+    @lru_cache(maxsize=None)
     def zabica_notranja(i, e_ostanek):
         #kdaj nehamo
         if i >= len(mocvara):
@@ -100,6 +101,8 @@ def zabica(mocvara):
         return 1 + min(navzdol)
 
     return zabica_notranja(0, 0)
+
+zabica([2, 4, 1, 2, 1, 3, 1, 1, 5])
 
 # =============================================================================
 # Nageljni
@@ -176,7 +179,37 @@ def nageljni_stevilo(n, m, l):
 # seznam indeksov mest, v katerih se Mortimer ustavi.
 # =============================================================================
 
+def pobeg(seznam_mest):
+    @lru_cache(maxsize=None)
+    def pobegi(i, denar):
+        #ROBNI PRIMERI
+            #ce pridemo do konca z negativnim denarjem
+        if i >= len(seznam_mest) and denar < 0:
+            return None
+            #ce pridemo do koca z pozitivnim denarjem
+        elif i >= len(seznam_mest) and denar >= 0:
+            return [i]
+        else:
+            usmeritve = seznam_mest[i]
 
+            #SHRANJEVANJE MOZNOSTI
+            mozne_poti = []  # tu bomo zbrali vse moznosti od mesta i do konca
+            for (i_mesta, stroski) in usmeritve:
+                #kam pridemo do konca ce izberemo to usmeritev - UPORABIS REKURZIJO
+                beg = pobegi(i_mesta, denar + stroski)
+                
+                #ce je beg sploh mozen dodamo to pot v moznosti
+                if beg is not None:
+                    mozne_poti.append(beg)
+            
+            #IZ SHRANJENIH MOZNOSTI IZLUSCIS PRAVE
+            if len(mozne_poti) == 0:
+                return None
+            else:
+                return [i] + sorted(mozne_poti, key=len)[0]
+        
+        #poklices na zacetnem primeru
+        return pobegi(0, 0)
 
 # =============================================================================
 # Pričetek robotske vstaje

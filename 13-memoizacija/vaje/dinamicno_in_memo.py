@@ -247,7 +247,7 @@ def pobeg(seznam_mest):
 # medtem ko iz vrste 5 in stolpca 0 ne more pobegniti.
 # =============================================================================
 
-def pobeg(soba, vrsta, stolpec, koraki):
+def pobeg_rob(soba, vrsta, stolpec, koraki):
     max_vrsta = len(soba)
     max_stolpec = len(soba[0])
 

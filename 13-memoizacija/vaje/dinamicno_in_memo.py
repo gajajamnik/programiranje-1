@@ -270,3 +270,61 @@ def pobeg_rob(soba, vrsta, stolpec, koraki):
         else:
             return False
     return pobegni(vrsta, stolpec, koraki)
+
+def pot_pobega(soba, vrsta, stolpec, koraki):
+
+    @lru_cache(maxsize=None)
+    def poti(vrsta, stolpec, koraki):
+        st_vrstic = len(soba)
+        st_stolpcev = len(soba[0])
+        
+        #ce smo ze pri vratih
+        if soba[vrsta][stolpec] == 1:
+            return []
+        #ce zmanjka goriva in nismo pri vratih
+        elif koraki == 0 and soba[vrsta][stolpec] != 1:
+            return None
+        #ce smo zunaj vrstice
+        elif vrsta > st_vrstic - 1 or vrsta < 0:
+            return None
+        #smo zunaj stolpcev
+        elif stolpec > st_stolpcev - 1 or stolpec < 0:
+            return None
+
+        #ce imamo se goriva in nismo na oviri
+        
+        elif soba[vrsta][stolpec] == 0 and koraki > 0:
+            
+            mozne_poti = []
+            if poti(vrsta - 1, stolpec, koraki - 1) is not None:
+                mozne_poti.append("gor")
+                mozne_poti += poti(vrsta - 1, stolpec, koraki - 1)
+            elif poti(vrsta + 1, stolpec, koraki - 1) is not None:
+                mozne_poti.append("dol")
+                mozne_poti += poti(vrsta + 1, stolpec, koraki - 1)
+            elif poti(vrsta, stolpec + 1, koraki - 1) is not None:
+                mozne_poti.append("desno")
+                mozne_poti += poti(vrsta, stolpec + 1, koraki - 1)
+            elif poti(vrsta, stolpec - 1, koraki - 1) is not None:
+                mozne_poti.append("levo")
+                mozne_poti += poti(vrsta, stolpec - 1, koraki - 1)
+            #ce je povsod okoli nas ovira
+            else:
+                return None
+            
+            return mozne_poti
+
+        #ce smo ze na zacetku na oviri
+        else:
+            return None
+        
+    return poti(vrsta, stolpec, koraki)
+
+laboratorij =  [[0, 1, 0, 0, 2],
+                [0, 2, 2, 0, 0],
+                [0, 0, 2, 2, 0],
+                [2, 0, 0, 2, 0],
+                [0, 2, 2, 0, 0],
+                [0, 0, 0, 2, 2]]
+
+pot_pobega(laboratorij, 3, 1, 5)

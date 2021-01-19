@@ -62,12 +62,12 @@ let rec nth i seznam = match seznam with
 
 (* d---------------------------------------------------------------------------*)
 
-(* ????????????????????? *)
+(* ????????????????????? 
 let is_sorted seznam = 
     let rec aux acc zadnji seznam = match seznam with
         | Prazen -> acc
         | Vozlisce(a, list) ->
-            let l = Array.length a + 1 in
+            let l = Array.length a - 1 in
             let rec urejen a i = 
                 if i > l then true
                 else if i = 0 then
@@ -77,7 +77,32 @@ let is_sorted seznam =
             in
             aux ((urejen a 0) && acc) a.(l) list
     in
-    aux true neg_infinity seznam
+    aux true (-1000000) seznam
+*)
+
+let is_sorted' seznam =
+    if seznam = Prazen then true
+    else
+    (*
+        let prvi_element seznam = match seznam with
+            | Prazen -> 0
+            | Vozlisce(a, _) -> a.(0) 
+        in *)
+        let rec aux zadnji seznam = match seznam with
+        | Prazen -> true
+        | Vozlisce(a, list) ->
+            let l = Array.length a - 1 in
+            let rec urejen a i = 
+                if i = 0 then true
+                else if a.(i) >= a.(i - 1) then urejen a (i - 1)
+                else false
+            in
+            if a.(0) < zadnji then false
+            else if urejen a l then aux a.(l) list
+            else false
+        in
+        aux (-1000) seznam
+             
 
 (* e---------------------------------------------------------------------------*)
 let rec update seznam i n = match seznam with

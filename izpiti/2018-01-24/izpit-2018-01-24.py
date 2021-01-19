@@ -5,12 +5,15 @@ primer = [[2, 4, 1, 1],
 
 from functools import lru_cache
 
+# zanima nas ŠTEVILO jabolk
 def lisjacek(matrika, n):
     vrstice = len(matrika)
     stolpci = len(matrika[0])
 
     @lru_cache(maxsize=None)
+    # postavljeni smo na ij-to mesto in ostalo nam je se n korakov
     def lisjacek_notranji(i, j, n):
+        #st_jabolk na tem polozaju
         jabolka = matrika[i][j]
         if n == 0:
             return 0
@@ -27,7 +30,7 @@ def lisjacek(matrika, n):
             #ne moremo desno -> lahko gremo samo dol
             if j == stolpci - 1:
                 return jabolka + lisjacek_notranji(i + 1, 0, n - 1)
-            #lahko gremo bilokam
+            #lahko gremo bilokam (izberemo smer desno/dol kjer dobimo vec jabolk)
             else:
                 return jabolka + max(lisjacek_notranji(i + 1, 0, n - 1), lisjacek_notranji(i, j + 1, n - 1))
        

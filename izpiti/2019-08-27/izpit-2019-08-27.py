@@ -1,9 +1,11 @@
 from functools import lru_cache
 
+#zanima nas ZAPOREDJE poti
 def pobeg(seznam):
     l = len(seznam)
 
     @lru_cache(maxsize=None)
+    # i je mesto v katerem smo, denar ki ga trenutno imamo
     def mozni_pobegi(i, denar):
         #ROBNI PRIMERI
         #uspe pobegnit s pozitivnim denarjem

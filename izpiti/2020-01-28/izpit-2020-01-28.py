@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+# zanima nas ŠTEVILO postavitev
 def mama_franca(n, m, l):
 
     @lru_cache(maxsize=None)
